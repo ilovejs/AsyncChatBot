@@ -1,28 +1,71 @@
-<!-- chat/templates/chat/index.html -->
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8"/>
-    <title>Chat Rooms</title>
+    <title>Chat Room</title>
+    {% load static %}
+    <link rel="stylesheet" media="all" type="text/css" href="{% static '/chat/style.css' %}">
 </head>
 <body>
-    What chat room would you like to enter?<br/>
-    <input id="room-name-input" type="text" size="100"/><br/>
-    <input id="room-name-submit" type="button" value="Enter"/>
+    <div class="chat">
+        <div class="chat-title">
+            <h1>Mike Z</h1>
+            <h2>Supah</h2>
+            <figure class="avatar">
+                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg" />
+            </figure>
+        </div>
+        <!--panel-->
+        <div class="messages">
+            <!-- div can be textarea -->
+            <div id="chat-log" class="messages-content"></div>
+        </div>
+        <!--sender panel-->
+        <div class="message-box">
+            <textarea type="text" id="chat-message-input" class="message-input" placeholder="Type message..."></textarea>
+            <button type="submit" id="chat-message-submit" class="message-submit">Send</button>
+        </div>
 
-    <script>
-        document.querySelector('#room-name-input').focus();
-        document.querySelector('#room-name-input').onkeyup = function(e) {
-            if (e.keyCode === 13) {  // enter, return
-                document.querySelector('#room-name-submit').click();
-            }
-        };
-
-        document.querySelector('#room-name-submit').onclick = function(e) {
-            var roomName = document.querySelector('#room-name-input').value;
-            window.location.pathname = '/chat/' + roomName + '/';
-        };
-    </script>
+    </div>
+    <div class="bg"></div>
 </body>
-</html>
+<script>
+    var roomName = 11;
 
+    var chatSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/chat/' + roomName + '/');
+
+    //append change log
+    chatSocket.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        var message = data['message'];
+        document.querySelector('#chat-log').value += (message + '\n');
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    var input_id = '#chat-message-input';
+    var submit_id = '#chat-message-submit';
+    
+    //focus on textarea
+    document.querySelector(input_id).focus();
+    //keyboard submit
+    document.querySelector(input_id).onkeyup = function(e) {
+        // enter, return
+        if (e.keyCode === 13) {  
+            document.querySelector(submit_id).click();
+        }
+    };
+    //mouse click submit
+    document.querySelector(submit_id).onclick = function(e) {
+        var messageInputDom = document.querySelector(input_id);
+        chatSocket.send(JSON.stringify({
+            'message': messageInputDom.value
+        }));
+        //reset input area
+        messageInputDom.value = '';
+    };
+</script>
+</html>
