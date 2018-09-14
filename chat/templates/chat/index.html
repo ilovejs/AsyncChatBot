@@ -20,7 +20,7 @@
         </div>
         <!--panel-->
         <div class="messages">
-            <div id="chat-log" class="messages-content"></div>
+            <div class="messages-content"></div>
         </div>
         <!--sender panel-->
         <div class="message-box">
@@ -32,7 +32,7 @@
     <div class="bg"></div>
 </body>
 <script>
-    var messages = $('.messages-content'), d, h, m, i = 0;
+    var messages = $(".messages-content"), d, h, m, i = 0;
 
     $(window).load(function () {        
         //mCustomScrollbar is function from jquery mCustomScrollbar plugin
@@ -62,10 +62,10 @@
     ]
 
     function updateScrollbar() {
-        messages.mCustomScrollbar("update").mCustomScrollbar('scrollTo', 'bottom', {
-            scrollInertia: 10,
-            timeout: 0
-        });
+        //messages.mCustomScrollbar("update").mCustomScrollbar('scrollTo', 'bottom', {
+        //    scrollInertia: 10,
+        //    timeout: 0
+        //});
     }
     
     function setDate() {
@@ -74,6 +74,30 @@
             m = d.getMinutes();
             $('<div class="timestamp">' + d.getHours() + ':' + m + '</div>').appendTo($('.message:last'));
         }
+    }
+
+    function insertMessage() {
+        console.log('insert msg..')
+        msg = $('.message-input').val();
+
+        //when user stop typing
+        if ( !$.trim(msg) ) {
+            return false;
+        }
+
+        $('<div class="message message-personal">' + msg + '</div>').appendTo(
+            $('.mCSB_container')
+        ).addClass('new');
+    
+        setDate();
+
+        $('.message-input').val(null);
+
+        updateScrollbar();
+
+        setTimeout(function () {
+            fakeMessage();
+        }, 1000 + (Math.random() * 20) * 100);
     }
 
     function fakeMessage() {
@@ -90,6 +114,7 @@
 
         setTimeout(function () {
             $('.message.loading').remove();
+            console.log('in a loop..')
             $('<div class="message new"><figure class="avatar"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg" /></figure>' + Fake[i] + '</div>').appendTo($('.mCSB_container')).addClass('new');
             
             setDate();
@@ -99,6 +124,7 @@
         }, 1000 + (Math.random() * 20) * 100);
     }
 
+    //connection
     var chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
 
     //append change log
@@ -106,7 +132,8 @@
         console.log('on-message event.')
         var data = JSON.parse(e.data);
         var message = data['message'];
-        $('#chat-log').text( $('#chat-log').text() + message + '\n' );
+        
+        insertMessage();
     };
 
     chatSocket.onclose = function(e) {
@@ -119,14 +146,14 @@
     //focus on textarea
     $(input_id).focus();
 
-    $(input_id).onkeyup = function(e) {
-        console.log('keyboard submit');
-        
+    $(input_id).keyup(function(e) {
         // enter, return
         if (e.keyCode === 13) {  
+            console.log('keyboard submit');
             $(submit_id).click();
         }
-    };
+    });
+
     //mouse click submit
     $(submit_id).click(function(e){
         console.log('client sending....');
@@ -135,8 +162,10 @@
         chatSocket.send(JSON.stringify({
             'message': messageInputDom.val()
         }));
+        //
+        insertMessage();
         //reset input area
-        messageInputDom.value = '';
+        messageInputDom.val('');
     });
 </script>
 </html>
