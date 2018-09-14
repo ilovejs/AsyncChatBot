@@ -1,88 +1,71 @@
-var $messages = $('.messages-content'), d, h, m, i = 0;
 
-$(window).load(function () {
-  //mCustomScrollbar is function from jquery mCustomScrollbar plugin
-  $messages.mCustomScrollbar();
-  setTimeout(function () {
-    fakeMessage();
-  }, 100);
-});
 
-function updateScrollbar() {
-  $messages.mCustomScrollbar("update").mCustomScrollbar('scrollTo', 'bottom', {
-    scrollInertia: 10,
-    timeout: 0
-  });
-}
 
-function setDate() {
-  d = new Date()
-  if (m != d.getMinutes()) {
-    m = d.getMinutes();
-    $('<div class="timestamp">' + d.getHours() + ':' + m + '</div>').appendTo($('.message:last'));
-  }
-}
 
-function insertMessage() {
-  console.log('insert msg.')
-  msg = $('.message-input').val();
-  if ($.trim(msg) == '') {
-    return false;
-  }
-  $('<div class="message message-personal">' + msg + '</div>').appendTo(
-    $('.mCSB_container')
-  ).addClass('new');
 
-  setDate();
-  $('.message-input').val(null);
-  updateScrollbar();
-  setTimeout(function () {
-    fakeMessage();
-  }, 1000 + (Math.random() * 20) * 100);
-}
+// function insertMessage() {
+//     console.log('insert msg..')
+//     msg = $('.message-input').val();
+//     if ($.trim(msg) == '') {
+//         return false;
+//     }
+//     $('<div class="message message-personal">' + msg + '</div>').appendTo(
+//         $('.mCSB_container')
+//     ).addClass('new');
 
-$('.message-submit').click(function () {
-  insertMessage();
-});
+//     setDate();
+//     $('.message-input').val(null);
+//     updateScrollbar();
+//     setTimeout(function () {
+//         fakeMessage();
+//     }, 1000 + (Math.random() * 20) * 100);
+// }
 
-$(window).on('keydown', function (e) {
-  if (e.which == 13) {
-    insertMessage();
-    return false;
-  }
-})
+// $('.message-submit').click(function () {
+//     insertMessage();
+// });
 
-var Fake = [
-  'Hi there, I\'m Fabio and you?',
-  'Nice to meet you',
-  'How are you?',
-  'Not too bad, thanks',
-  'What do you do?',
-  'That\'s awesome',
-  'Codepen is a nice place to stay',
-  'I think you\'re a nice person',
-  'Why do you think that?',
-  'Can you explain?',
-  'Anyway I\'ve gotta go now',
-  'It was a pleasure chat with you',
-  'Time to make a new codepen',
-  'Bye',
-  ':)'
-]
+// $(window).on('keydown', function (e) {
+//     if (e.which == 13) {
+//         insertMessage();
+//         return false;
+//     }
+// })
 
-function fakeMessage() {
-  if ($('.message-input').val() != '') {
-    return false;
-  }
-  $('<div class="message loading new"><figure class="avatar"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg" /></figure><span></span></div>').appendTo($('.mCSB_container'));
-  updateScrollbar();
+    var chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
 
-  setTimeout(function () {
-    $('.message.loading').remove();
-    $('<div class="message new"><figure class="avatar"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg" /></figure>' + Fake[i] + '</div>').appendTo($('.mCSB_container')).addClass('new');
-    setDate();
-    updateScrollbar();
-    i++;
-  }, 1000 + (Math.random() * 20) * 100);
+    //append change log
+    chatSocket.onmessage = function(e) {
+        console.log('on-message event.')
+        var data = JSON.parse(e.data);
+        var message = data['message'];
+        $('#chat-log').text += (message + '\n');
+    };
 
-}
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    var input_id = '.message-input';
+    var submit_id = '#message-submit';
+    
+    //focus on textarea
+    $(input_id).focus();
+    //keyboard submit
+    $(input_id).onkeyup = function(e) {
+        // enter, return
+        if (e.keyCode === 13) {  
+            $(submit_id).click();
+        }
+    };
+    //mouse click submit
+    $(submit_id).click(function(e){
+        console.log('client sending....');
+
+        var messageInputDom = $(input_id);
+        chatSocket.send(JSON.stringify({
+            'message': messageInputDom.value
+        }));
+        //reset input area
+        messageInputDom.value = '';
+    });

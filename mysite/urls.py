@@ -19,6 +19,6 @@ from django.contrib import admin
 
 urlpatterns = [
     # main root points to chat app
-    url(r'^chat/$', include('chat.urls')),
+    url(r'^chat/', include('chat.urls')),
     url(r'^admin/', admin.site.urls),
 ]

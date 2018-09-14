@@ -24,49 +24,79 @@
         </div>
         <!--sender panel-->
         <div class="message-box">
-            <textarea type="text" id="chat-message-input" class="message-input" placeholder="Type message..."></textarea>
-            <button type="submit" id="chat-message-submit" class="message-submit">Send</button>
+            <textarea type="text" id="message-input" placeholder="Type message..."></textarea>
+            <button type="submit" id="message-submit">Send</button>
         </div>
 
     </div>
     <div class="bg"></div>
 </body>
 <script>
-    var chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
+    var messages = $('.messages-content'), d, h, m, i = 0;
 
-    //append change log
-    chatSocket.onmessage = function(e) {
-        console.log('on-message event.')
-        var data = JSON.parse(e.data);
-        var message = data['message'];
-        $('#chat-log').text += (message + '\n');
-    };
+    $(window).load(function () {        
+        //mCustomScrollbar is function from jquery mCustomScrollbar plugin
+        messages.mCustomScrollbar();
 
-    chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
-    };
+        setTimeout(function () {
+            fakeMessage();
+        }, 100);
+    });
 
-    var input_id = '#chat-message-input';
-    var submit_id = '#chat-message-submit';
+    var Fake = [
+        'Hi there, I\'m Fabio and you?',
+        'Nice to meet you',
+        'How are you?',
+        'Not too bad, thanks',
+        'What do you do?',
+        'That\'s awesome',
+        'Codepen is a nice place to stay',
+        'I think you\'re a nice person',
+        'Why do you think that?',
+        'Can you explain?',
+        'Anyway I\'ve gotta go now',
+        'It was a pleasure chat with you',
+        'Time to make a new codepen',
+        'Bye',
+        ':)'
+    ]
+
+    function updateScrollbar() {
+        messages.mCustomScrollbar("update").mCustomScrollbar('scrollTo', 'bottom', {
+            scrollInertia: 10,
+            timeout: 0
+        });
+    }
     
-    //focus on textarea
-    $(input_id).focus();
-    //keyboard submit
-    $(input_id).onkeyup = function(e) {
-        // enter, return
-        if (e.keyCode === 13) {  
-            $(submit_id).click();
+    function setDate() {
+        d = new Date()
+        if (m != d.getMinutes()) {
+            m = d.getMinutes();
+            $('<div class="timestamp">' + d.getHours() + ':' + m + '</div>').appendTo($('.message:last'));
         }
-    };
-    //mouse click submit
-    $(submit_id).onclick = function(e) {
-        console.log('client sending....')
-        var messageInputDom = $(input_id);
-        chatSocket.send(JSON.stringify({
-            'message': messageInputDom.value
-        }));
-        //reset input area
-        messageInputDom.value = '';
-    };
+    }
+
+    function fakeMessage() {
+        console.log('fakeMessage')
+        
+        //if user typed some words
+        if ($('.message-input').val() != '') {
+            //return false;
+        }
+
+        $('<div class="message loading new"><figure class="avatar"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg" /></figure><span></span></div>').appendTo($('.mCSB_container'));
+        
+        updateScrollbar();
+
+        setTimeout(function () {
+            $('.message.loading').remove();
+            $('<div class="message new"><figure class="avatar"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg" /></figure>' + Fake[i] + '</div>').appendTo($('.mCSB_container')).addClass('new');
+            
+            setDate();
+
+            updateScrollbar();
+            i++;
+        }, 1000 + (Math.random() * 20) * 100);
+    }
 </script>
 </html>
