@@ -1,10 +1,9 @@
-var $messages = $('.messages-content'),
-    d, h, m,
-    i = 0;
+var $messages = $('.messages-content'), d, h, m, i = 0;
 
-$(window).load(function() {
+$(window).load(function () {
+  //mCustomScrollbar is function from jquery mCustomScrollbar plugin
   $messages.mCustomScrollbar();
-  setTimeout(function() {
+  setTimeout(function () {
     fakeMessage();
   }, 100);
 });
@@ -16,7 +15,7 @@ function updateScrollbar() {
   });
 }
 
-function setDate(){
+function setDate() {
   d = new Date()
   if (m != d.getMinutes()) {
     m = d.getMinutes();
@@ -25,24 +24,28 @@ function setDate(){
 }
 
 function insertMessage() {
+  console.log('insert msg.')
   msg = $('.message-input').val();
   if ($.trim(msg) == '') {
     return false;
   }
-  $('<div class="message message-personal">' + msg + '</div>').appendTo($('.mCSB_container')).addClass('new');
+  $('<div class="message message-personal">' + msg + '</div>').appendTo(
+    $('.mCSB_container')
+  ).addClass('new');
+
   setDate();
   $('.message-input').val(null);
   updateScrollbar();
-  setTimeout(function() {
+  setTimeout(function () {
     fakeMessage();
   }, 1000 + (Math.random() * 20) * 100);
 }
 
-$('.message-submit').click(function() {
+$('.message-submit').click(function () {
   insertMessage();
 });
 
-$(window).on('keydown', function(e) {
+$(window).on('keydown', function (e) {
   if (e.which == 13) {
     insertMessage();
     return false;
@@ -74,7 +77,7 @@ function fakeMessage() {
   $('<div class="message loading new"><figure class="avatar"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg" /></figure><span></span></div>').appendTo($('.mCSB_container'));
   updateScrollbar();
 
-  setTimeout(function() {
+  setTimeout(function () {
     $('.message.loading').remove();
     $('<div class="message new"><figure class="avatar"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg" /></figure>' + Fake[i] + '</div>').appendTo($('.mCSB_container')).addClass('new');
     setDate();

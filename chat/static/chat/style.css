@@ -98,6 +98,10 @@ Chat Title
   width: 100%;
   height: auto;
 }
+/**/
+.messages textarea {
+  background: rgba(0, 0, 0, 0.5);
+} 
 
 /*--------------------
 Messages

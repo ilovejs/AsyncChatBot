@@ -71,7 +71,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
-# mysite/settings.py
+
+# Points to 'mysite/settings.py'
 # Channels
 ASGI_APPLICATION = 'mysite.routing.application'
 CHANNEL_LAYERS = {

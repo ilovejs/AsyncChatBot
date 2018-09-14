@@ -5,6 +5,9 @@
     <title>Chat Room</title>
     {% load static %}
     <link rel="stylesheet" media="all" type="text/css" href="{% static '/chat/style.css' %}">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.3/jquery.mCustomScrollbar.concat.min.js"></script>
+    <script type="text/javascript" src="{% static '/chat/chat.js' %}"></script>
 </head>
 <body>
     <div class="chat">
@@ -17,7 +20,6 @@
         </div>
         <!--panel-->
         <div class="messages">
-            <!-- div can be textarea -->
             <div id="chat-log" class="messages-content"></div>
         </div>
         <!--sender panel-->
@@ -30,16 +32,14 @@
     <div class="bg"></div>
 </body>
 <script>
-    var roomName = 11;
-
-    var chatSocket = new WebSocket(
-        'ws://' + window.location.host + '/ws/chat/' + roomName + '/');
+    var chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
 
     //append change log
     chatSocket.onmessage = function(e) {
+        console.log('on-message event.')
         var data = JSON.parse(e.data);
         var message = data['message'];
-        document.querySelector('#chat-log').value += (message + '\n');
+        $('#chat-log').text += (message + '\n');
     };
 
     chatSocket.onclose = function(e) {
@@ -50,17 +50,18 @@
     var submit_id = '#chat-message-submit';
     
     //focus on textarea
-    document.querySelector(input_id).focus();
+    $(input_id).focus();
     //keyboard submit
-    document.querySelector(input_id).onkeyup = function(e) {
+    $(input_id).onkeyup = function(e) {
         // enter, return
         if (e.keyCode === 13) {  
-            document.querySelector(submit_id).click();
+            $(submit_id).click();
         }
     };
     //mouse click submit
-    document.querySelector(submit_id).onclick = function(e) {
-        var messageInputDom = document.querySelector(input_id);
+    $(submit_id).onclick = function(e) {
+        console.log('client sending....')
+        var messageInputDom = $(input_id);
         chatSocket.send(JSON.stringify({
             'message': messageInputDom.value
         }));
