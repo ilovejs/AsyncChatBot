@@ -119,6 +119,7 @@ Messages
   left: 0;
   height: 101%;
   width: 100%;
+  overflow: auto;       /* scroll */
 }
 .messages .message {
   clear: both;
