@@ -32,30 +32,17 @@
     <div class="bg"></div>
 </body>
 <script>
-    var messages = $(".messages-content"), d, h, m, i = 0;
+    var messages = $(".messages-content");
+    var d, h, m, i = 0;
     var robot_profile_img = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg';
-
-    //connection
-    var chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
-
-    chatSocket.onmessage = function(e) {
-        var data = JSON.parse(e.data);
-        var bmsg = data['message'];
-        console.log('recv bot msg' + bmsg);
-        robotMessage(bmsg);
-    };
-
-    chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
-    };
-
+        
     $(window).load(function () {        
         //mCustomScrollbar is function from jquery mCustomScrollbar plugin
         messages.mCustomScrollbar();
     });
 
     function updateScrollbar() {
-        console.log('updateScrollerBar...');
+        console.log('updateScrollbar.');
         messages.mCustomScrollbar("update").mCustomScrollbar('scrollTo', 'bottom', {
             scrollInertia: 10,
             timeout: 0
@@ -90,23 +77,40 @@
     }
 
     function robotMessage(bot_msg) {
-        console.log('fn robotMessage')
-
+        console.log('[' + typeof(bot_msg) + '] bot_msg: ' + bot_msg)
+        
         //message loading
         //$('<div class="message loading new"><figure class="avatar"><img src=' + robot_profile_img + ' /></figure><span></span></div>').appendTo($('.mCSB_container'));
-
         //updateScrollbar();
-
         //$('.message.loading').remove();
             
-        $('<div class="message new"><figure class="avatar"><img src=' + robot_profile_img + ' /></figure>' 
+        $('<div class="message new"><figure class="avatar"><img src="'+robot_profile_img+'"/></figure>' 
             + bot_msg + '</div>').appendTo($('.mCSB_container')).addClass('new');
         
         setDate();
-
-        updateScrollbar();
+        //updateScrollbar();
+        console.log('bot msg done')
     }
 
+    setTimeout(function (){ console.log('chat start connection'), 91000 })
+    
+    //connection
+    var chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
+
+    chatSocket.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        var bmsg = data['message'];
+        robotMessage(bmsg);
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    chatSocket.onerror = function(e) {
+        console.error(e);
+    }
+    
     // brower init
     var input_id = '.message-input';
     var submit_id = '.message-submit';

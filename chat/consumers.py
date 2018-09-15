@@ -1,12 +1,28 @@
-# chat/consumers.py
+import json, re
 from channels.generic.websocket import AsyncWebsocketConsumer
-import json
-# from string import strip
+from django.core.checks import Error
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    def init(self):
+        self.dob = ''
+        self.gendar = ''
+        self.age = 0
+        self.name = ''
+        self.dob_regx = re.compile(r'\d{2}-\d{2}-\d{4}')
+        self.smoker = ''
+
+    async def wrap_msg(self, msg):
+        self.init()
+        # Send message to room
+        await self.send(text_data=json.dumps({
+            'type': 'chat_message',
+            'message': msg
+        }))
+
     async def connect(self):
-        print('connected')
         await self.accept()
+        await self.wrap_msg("Hello, I am going to ask you few questions that will help me know you better?")
+        await self.wrap_msg("What is your name?")
 
     async def disconnect(self, close_code):
         print('discounted')
@@ -14,23 +30,28 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         print(text_data)
         text_data_json = json.loads(text_data)
-        message = text_data_json['message'].replace('\n','').strip()
+        msg = text_data_json['message'].replace('\n','').strip()
 
-        if message in ['Male','Female']:
-            message = 'When were you born?'
-        elif message == '03-26-1989':        # Let user input date in (dd-mm-yyyy) format
-            message = 'Are you a smoker?'
-        else: # Yes or No
-            message = 'Thank you. Press "Done" for results.'
+        if msg in ['Male','Female']:
+            self.gendar = msg
+            msg = 'When were you born?'
+        elif self.dob_regx.match(msg):
+            self.dob = msg
+            msg = 'Are you a smoker?'
+        elif msg in ['Yes','No']:
+            self.smoker = msg
+            msg = 'Thank you. Press "Done" for results.'
+        else:
+            print('get name')
+            self.name = msg
+            msg = 'Are you male or female?'
 
-        # Send message to room group
-        await self.send(text_data=json.dumps({
-            'type': 'chat_message',
-            'message': message
-        }))
+        self.wrap_msg(msg)
 
     async def chat_message(self, event):
         message = event['message']
+        print('Not Implemented ..........')
+        # raise Error('Not Implemented')
 
         # Send message to WebSocket
         # await self.send(text_data=json.dumps({
