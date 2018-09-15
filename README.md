@@ -4,16 +4,18 @@
 - front-end scss
 - django-channel
 
-### business assumption
+`tips: doc folder has demo photo`
+
+## business assumption
 
 date of birth > 1818
 
-### front end
+## front end
 message scrolling (jquery plugin can be omitted)
 
 button send ws request
 
-### ux credit to 
+## ux credit to 
 
 Fabio Ottaviani - Supah
     
@@ -26,18 +28,24 @@ Fabio Ottaviani - Supah
 ### Install
 *** python 3.6 ***
 
-    source active py36 # skip this step if 3.6 is installed
+    source activate py36    # skip this step if 3.6 is installed
     
-    pip install -r requirement
+    pip install -r requirement.txt
     
     python3 manager.py runserver
-    
+    or `python manager.py runserver`
+
     # might need to install redis.
         
     brew install redis
     
-### open
+### View after install
 
-[dd]:(http://127.0.0.1:8000)
-[or]:(http://127.0.0.1/chat)
+[open url](http://127.0.0.1:8000)
+or 
+[chat route](http://127.0.0.1/chat)
+or 
+simply http://127.0.0.1:8000 
 
+### Contact bugfix, Pull request
+zhuangdeyouxiang@gmail.com
