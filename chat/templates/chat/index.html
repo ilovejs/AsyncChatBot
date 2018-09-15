@@ -13,7 +13,7 @@
     <div class="chat">
         <div class="chat-title">
             <h1>Mike Z</h1>
-            <h2>Supah</h2>
+            <h2>ilovejs</h2>
             <figure class="avatar">
                 <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg" />
             </figure>
@@ -33,7 +33,7 @@
 </body>
 <script>
     let messages = $(".messages-content");
-    let d, m = 0;
+    let last_min = 0;
     let robot_profile_img = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg';
 
     $(window).load(function () {
@@ -51,11 +51,18 @@
 
     //append to last message
     function setDate() {
-        d = new Date();
-        if (m != d.getMinutes()) {
-            m = d.getMinutes();
-            $('<div class="timestamp">' + d.getHours() + ':' + m + '</div>').appendTo($('.message:last'));
+        let last_msg = $('.message.new').last();
+        let d = new Date();
+
+        $('<div class="timestamp">' + d.getHours() + ':' + last_min + ':' + d.getSeconds() + '</div>').appendTo(last_msg);
+
+        /* log time per minute
+        if (last_min !== d.getMinutes()) {
+            last_min = d.getMinutes();
+            $('<div class="timestamp">' + d.getHours() + ':' + last_min + '</div>')
+                .appendTo(last_msg);
         }
+        */
     }
 
     //attach client message
@@ -100,16 +107,25 @@
         updateScrollbar();
     }
 
+    function clientWsSend(msg) {
+        chatSocket.send(JSON.stringify({
+            'message': msg
+        }));
+    }
+
     //connection
     let chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
 
-    {#chatSocket.onopen = function(e) {#}
-    {#    let chat_box_dom = $('.mCSB_container');#}
-    {#    let greeting_msg = 'user join chat.';#}
-    {##}
-    {#    $('<div class="message new"><figure class="avatar"><img src="' + robot_profile_img + '"/></figure>'#}
-    {#        + greeting_msg + '</div>').appendTo(chat_box_dom).addClass('new');#}
-    {#};#}
+    /*  Do nothing on Open
+        chatSocket.onopen = function(e) {
+
+        let chat_box_dom = $('.mCSB_container');
+        let greeting_msg = 'user join chat.';
+
+        $('<div class="message new"><figure class="avatar"><img src="' + robot_profile_img + '"/></figure>'
+            + greeting_msg + '</div>').appendTo(chat_box_dom).addClass('new');
+        };
+    */
 
     chatSocket.onmessage = function(e) {
         let data = JSON.parse(e.data);
@@ -117,12 +133,14 @@
         robotMessage(bmsg);
     };
 
-    chatSocket.onclose = function(e) {
+    chatSocket.onclose = function() {
         console.error('Chat socket closed unexpectedly');
+        alert('websocket disconnected. Refresh.');
     };
 
     chatSocket.onerror = function(e) {
         console.error(e);
+        alert('Server error. Refresh.');
     };
     
     // browser init
@@ -139,7 +157,7 @@
         }
     });
 
-    //mouse submit
+    //user mouse submit to ws
     $(submit_id).click(function(e){
         let messageInputDom = $(input_id);
         let cmsg = messageInputDom.val();
@@ -149,8 +167,6 @@
         }));
         
         clientMessage(cmsg);
-        
-        //messageInputDom.val('');
     });
 </script>
 </html>
