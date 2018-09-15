@@ -33,36 +33,29 @@
 </body>
 <script>
     var messages = $(".messages-content"), d, h, m, i = 0;
+    var robot_profile_img = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg';
+
+    //connection
+    var chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
+
+    chatSocket.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        var bmsg = data['message'];
+        console.log('recv bot msg' + bmsg);
+        robotMessage(bmsg);
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
 
     $(window).load(function () {        
         //mCustomScrollbar is function from jquery mCustomScrollbar plugin
         messages.mCustomScrollbar();
-
-        setTimeout(function () {
-            fakeMessage();
-        }, 100);
     });
 
-    var Fake = [
-        'Hi there, I\'m Fabio and you?',
-        'Nice to meet you',
-        'How are you?',
-        'Not too bad, thanks',
-        'What do you do?',
-        'That\'s awesome',
-        'Codepen is a nice place to stay',
-        'I think you\'re a nice person',
-        'Why do you think that?',
-        'Can you explain?',
-        'Anyway I\'ve gotta go now',
-        'It was a pleasure chat with you',
-        'Time to make a new codepen',
-        'Bye',
-        ':)'
-    ]
-
     function updateScrollbar() {
-        console.log('updateScrollerBar...')
+        console.log('updateScrollerBar...');
         messages.mCustomScrollbar("update").mCustomScrollbar('scrollTo', 'bottom', {
             scrollInertia: 10,
             timeout: 0
@@ -77,12 +70,10 @@
         }
     }
 
-    function insertMessage() {
-        console.log('insert msg..')
-        msg = $('.message-input').val();
+    function clientMessage(msg) {
+        msg = $.trim(msg);
 
-        //when user stop typing
-        if ( !$.trim(msg) ) {
+        if (!msg) {
             return false;
         }
 
@@ -91,56 +82,32 @@
         ).addClass('new');
     
         setDate();
-
+        
+        //reset input area
         $('.message-input').val(null);
 
         updateScrollbar();
-
-        setTimeout(function () {
-            fakeMessage();
-        }, 1000 + (Math.random() * 20) * 100);
     }
 
-    function fakeMessage() {
-        console.log('fakeMessage')
-        
-        //if user typed some words
-        if ($('.message-input').val() != '') {
-            return false;
-        }
+    function robotMessage(bot_msg) {
+        console.log('fn robotMessage')
 
-        $('<div class="message loading new"><figure class="avatar"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg" /></figure><span></span></div>').appendTo($('.mCSB_container'));
-        
-        updateScrollbar();
+        //message loading
+        //$('<div class="message loading new"><figure class="avatar"><img src=' + robot_profile_img + ' /></figure><span></span></div>').appendTo($('.mCSB_container'));
 
-        setTimeout(function () {
-            $('.message.loading').remove();
-            console.log('in a loop..')
-            $('<div class="message new"><figure class="avatar"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg" /></figure>' + Fake[i] + '</div>').appendTo($('.mCSB_container')).addClass('new');
+        //updateScrollbar();
+
+        //$('.message.loading').remove();
             
-            setDate();
+        $('<div class="message new"><figure class="avatar"><img src=' + robot_profile_img + ' /></figure>' 
+            + bot_msg + '</div>').appendTo($('.mCSB_container')).addClass('new');
+        
+        setDate();
 
-            updateScrollbar();
-            i++;
-        }, 1000 + (Math.random() * 20) * 100);
+        updateScrollbar();
     }
 
-    //connection
-    var chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
-
-    //append change log
-    chatSocket.onmessage = function(e) {
-        console.log('on-message event.')
-        var data = JSON.parse(e.data);
-        var message = data['message'];
-        
-        insertMessage();
-    };
-
-    chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
-    };
-
+    // brower init
     var input_id = '.message-input';
     var submit_id = '.message-submit';
     
@@ -150,23 +117,22 @@
     $(input_id).keyup(function(e) {
         // enter, return
         if (e.keyCode === 13) {  
-            console.log('keyboard submit');
             $(submit_id).click();
         }
     });
 
-    //mouse click submit
+    //mouse submit
     $(submit_id).click(function(e){
-        console.log('client sending....');
-
         var messageInputDom = $(input_id);
+        var cmsg = messageInputDom.val();
+
         chatSocket.send(JSON.stringify({
-            'message': messageInputDom.val()
+            'message': cmsg
         }));
-        //
-        insertMessage();
-        //reset input area
-        messageInputDom.val('');
+        
+        clientMessage(cmsg);
+        
+        //messageInputDom.val('');
     });
 </script>
 </html>
