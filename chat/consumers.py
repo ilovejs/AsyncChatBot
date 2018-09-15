@@ -24,7 +24,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
         await self.wrap_msg("Hello, I am going to ask you few questions that will help me know you better?")
-        # await self.wrap_msg("What is your name?")
+        await self.wrap_msg("What is your name?")
 
     async def disconnect(self, close_code):
         print('discounted')
@@ -44,7 +44,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             msg = r'Are you a smoker?'
         elif msg in ['yes', 'no']:
             self.smoker = True
-            msg = r'Thank you. Press <form method="get" action="/chat/done3">'\
+            msg = r'Thank you. Press <form method="get" action="/chat/done">'\
                   r'<button type="submit">Continue</button></form> for results.'
         elif self.state == 0:
             self.state = 1

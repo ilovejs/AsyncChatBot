@@ -36,6 +36,13 @@
     let d, m = 0;
     let robot_profile_img = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg';
 
+    $(window).load(function () {
+        //mCustomScrollbar is function from jquery mCustomScrollbar plugin
+        messages.mCustomScrollbar();
+    });
+    //double loading to prevent `ws load too quick with no greeting message` problem
+    messages.mCustomScrollbar();
+
     //scroll down
     function updateScrollbar() {
         console.log('updateScrollbar.');
@@ -70,34 +77,39 @@
         updateScrollbar();
     }
 
+    function showMessageLoading(){
+        let chat_box_dom = $('.mCSB_container');
+
+        //message loading
+        $('<div class="message loading new"><figure class="avatar"><img src=' + robot_profile_img + '/></figure><span></span></div>')
+            .appendTo(chat_box_dom);
+
+        updateScrollbar();
+        $('.message.loading').remove();
+    }
+
     function robotMessage(bot_msg) {
         console.log('[' + typeof(bot_msg) + '] bot_msg: ' + bot_msg);
 
-        //message loading
-        $('<div class="message loading new"><figure class="avatar"><img src=' + robot_profile_img + ' /></figure><span></span></div>').appendTo($('.mCSB_container'));
-        updateScrollbar();
-        $('.message.loading').remove();
+        let chat_box_dom = $('.mCSB_container');
 
         $('<div class="message new"><figure class="avatar"><img src="' + robot_profile_img + '"/></figure>'
-            + bot_msg + '</div>').appendTo($('.mCSB_container')).addClass('new');
+            + bot_msg + '</div>').appendTo(chat_box_dom).addClass('new');
 
         setDate();
         updateScrollbar();
-     }
-
-    $(window).load(function () {
-        //mCustomScrollbar is function from jquery mCustomScrollbar plugin
-        messages.mCustomScrollbar();
-    });
-
-    {#setTimeout(function() {console.log('xx')}, 2000)#}
+    }
 
     //connection
     let chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
 
-    chatSocket.onopen = function(e) {
-
-    };
+    {#chatSocket.onopen = function(e) {#}
+    {#    let chat_box_dom = $('.mCSB_container');#}
+    {#    let greeting_msg = 'user join chat.';#}
+    {##}
+    {#    $('<div class="message new"><figure class="avatar"><img src="' + robot_profile_img + '"/></figure>'#}
+    {#        + greeting_msg + '</div>').appendTo(chat_box_dom).addClass('new');#}
+    {#};#}
 
     chatSocket.onmessage = function(e) {
         let data = JSON.parse(e.data);
