@@ -23,7 +23,7 @@ Fabio Ottaviani - Supah
 
 ### snapshot
     
-![demo] (doc/demo.png)
+<img src="https://github.com/ilovejs/chatbot/blob/master/doc/demo.png" width="400" height="500"/>
 
 ### Install
 *** python 3.6 ***
