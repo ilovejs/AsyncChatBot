@@ -26,7 +26,9 @@ Fabio Ottaviani - Supah
 <img src="https://github.com/ilovejs/chatbot/blob/master/doc/demo.png" width="400" height="500"/>
 
 ### Install option 1
-*** using pip env for Pyton 3.7 ***
+
+* using pip env for Pyton 3.7 *
+
     pipenv install
     
     pipenv run python manage.py runserver
@@ -54,7 +56,7 @@ python_version = "3.7"
 ```
 
 ### Install option 2
-*** python 3.6 ***
+* python 3.6 *
 
     source activate py36    # skip this step if 3.6 is installed
     
