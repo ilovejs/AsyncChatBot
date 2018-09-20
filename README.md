@@ -26,11 +26,32 @@ Fabio Ottaviani - Supah
 <img src="https://github.com/ilovejs/chatbot/blob/master/doc/demo.png" width="400" height="500"/>
 
 ### Install option 1
+*** using pip env for Pyton 3.7 ***
     pipenv install
     
     pipenv run python manage.py runserver
     
     making sure redis is running under 127.0.0.1:6379 by execute `redis-cli` in bash
+
+After running pipenv install, here is the Pipfile you might see. Just double check.
+```
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+channels = "*"
+django-cors-headers = "==2.1.0"
+django-templated-mail = "==1.0.0"
+Django = "==2.*"
+channels_redis = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.7"
+```
 
 ### Install option 2
 *** python 3.6 ***
