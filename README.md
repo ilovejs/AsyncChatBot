@@ -25,7 +25,14 @@ Fabio Ottaviani - Supah
     
 <img src="https://github.com/ilovejs/chatbot/blob/master/doc/demo.png" width="400" height="500"/>
 
-### Install
+### Install option 1
+    pipenv install
+    
+    pipenv run python manage.py runserver
+    
+    making sure redis is running under 127.0.0.1:6379 by execute `redis-cli` in bash
+
+### Install option 2
 *** python 3.6 ***
 
     source activate py36    # skip this step if 3.6 is installed
